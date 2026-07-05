@@ -22,7 +22,7 @@ modules sont des contraintes de premier ordre.
 |---|---|
 | Cœur du MVP | Drill de comptage pur (running count Hi-Lo), une seule mécanique très polie |
 | Plateforme | Web desktop d'abord (SPA), responsive plus tard |
-| Monétisation | Freemium limité par usage : X sessions/jour gratuites, abonnement pour l'illimité |
+| Monétisation | Freemium limité par usage : 3 sessions/jour gratuites (valeur configurable en base), abonnement pour l'illimité |
 | Prix | ~7-10 €/mois + plan annuel réduit (~-40 %), deux prix Stripe |
 | Gamification MVP | XP + niveaux, streak quotidien. Leaderboards et badges : post-MVP |
 | Funnel | Essai anonyme immédiat (state local), compte requis pour sauvegarder la progression |
@@ -128,7 +128,7 @@ alimente `accuracy`, empêche de deviner le résultat final.
 
 ### Difficulté : 10 paliers fixes
 Du palier 1 (20 cartes, 1200 ms) au palier 10 (104 cartes / 2 decks, 400 ms,
-checkpoints). Déblocage : N sessions réussies du palier courant. Pas de
+checkpoints). Déblocage : 3 sessions réussies du palier courant. Pas de
 réglage libre au MVP (option premium future).
 
 ### XP et niveaux
