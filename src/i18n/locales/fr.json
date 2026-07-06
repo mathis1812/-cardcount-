@@ -24,5 +24,16 @@
     "replayCard": "Carte",
     "replayValue": "Valeur Hi-Lo",
     "replayCount": "Count cumulé"
+  },
+  "auth": {
+    "signupTab": "Créer un compte",
+    "loginTab": "Se connecter",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "submitSignup": "Créer mon compte",
+    "submitLogin": "Connexion",
+    "logout": "Se déconnecter",
+    "loggedIn": "Connecté",
+    "genericError": "Une erreur est survenue. Réessaie."
   }
 }
