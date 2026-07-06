@@ -1,5 +1,28 @@
 {
   "app": {
     "title": "Hello CardCount"
+  },
+  "drill": {
+    "pickTier": "Choisis ton palier",
+    "tier": "Palier {{tier}}",
+    "tierLocked": "Palier {{tier}} (verrouillé)",
+    "start": "Lancer la session",
+    "progress": "Carte {{current}} / {{total}}",
+    "checkpointPrompt": "Quel est le count actuel ?",
+    "finalPrompt": "Quel est le running count final ?",
+    "submit": "Valider",
+    "correct": "Bien joué !",
+    "incorrect": "Raté…",
+    "expected": "Count attendu : {{value}}",
+    "given": "Ta réponse : {{value}}",
+    "accuracy": "Précision : {{percent}} %",
+    "xpEarned": "+{{xp}} XP",
+    "newSession": "Nouvelle session",
+    "level": "Niveau {{level}}",
+    "xpTotal": "{{xp}} XP",
+    "replayTitle": "Rejeu pédagogique",
+    "replayCard": "Carte",
+    "replayValue": "Valeur Hi-Lo",
+    "replayCount": "Count cumulé"
   }
 }
