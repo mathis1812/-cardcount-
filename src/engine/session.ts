@@ -1,4 +1,4 @@
-import { buildDecks, CARDS_PER_DECK, type Card } from './cards'
+import { buildDecks, CARDS_PER_DECK, runningCount, type Card } from './cards'
 import { createRng, shuffle } from './shuffle'
 import type { TierConfig } from './tiers'
 
@@ -70,4 +70,53 @@ export function currentCard(state: SessionState): Card {
     throw new Error('Aucune carte révélée pour le moment')
   }
   return state.cards[state.position - 1]
+}
+
+export interface SessionResult {
+  readonly correct: boolean
+  readonly expectedCount: number
+  readonly givenCount: number
+  readonly accuracy: number
+  readonly cardsSeen: number
+  readonly checkpointAnswers: readonly CheckpointAnswer[]
+}
+
+export function answerCheckpoint(
+  state: SessionState,
+  given: number,
+): SessionState {
+  if (state.phase !== 'awaiting-checkpoint') {
+    throw new Error(`Réponse de checkpoint impossible en phase ${state.phase}`)
+  }
+  const expected = runningCount(state.cards.slice(0, state.position))
+  const answer: CheckpointAnswer = {
+    position: state.position,
+    expected,
+    given,
+    correct: given === expected,
+  }
+  return {
+    ...state,
+    phase: 'running',
+    checkpointAnswers: [...state.checkpointAnswers, answer],
+  }
+}
+
+export function answerFinal(state: SessionState, given: number): SessionResult {
+  if (state.phase !== 'awaiting-final') {
+    throw new Error(`Réponse finale impossible en phase ${state.phase}`)
+  }
+  const expectedCount = runningCount(state.cards)
+  const correct = given === expectedCount
+  const totalAnswers = state.checkpointAnswers.length + 1
+  const correctAnswers =
+    state.checkpointAnswers.filter((a) => a.correct).length + (correct ? 1 : 0)
+  return {
+    correct,
+    expectedCount,
+    givenCount: given,
+    accuracy: correctAnswers / totalAnswers,
+    cardsSeen: state.cards.length,
+    checkpointAnswers: state.checkpointAnswers,
+  }
 }
