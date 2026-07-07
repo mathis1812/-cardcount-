@@ -36,12 +36,10 @@ describe('startDrillSession', () => {
 
 describe('fetchSubscriptionStatus', () => {
   test('mappe is_premium et plan', async () => {
-    const rpc = vi
-      .fn()
-      .mockResolvedValue({
-        data: { is_premium: true, plan: 'yearly' },
-        error: null,
-      })
+    const rpc = vi.fn().mockResolvedValue({
+      data: { is_premium: true, plan: 'yearly' },
+      error: null,
+    })
     vi.mocked(getSupabase).mockReturnValue({ rpc } as never)
     await expect(fetchSubscriptionStatus()).resolves.toEqual({
       isPremium: true,
@@ -62,12 +60,10 @@ describe('startCheckout / openBillingPortal', () => {
 
   test('startCheckout POSTe le plan avec le token et renvoie l’URL', async () => {
     stubSession()
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue({
-        ok: true,
-        json: async () => ({ url: 'https://co/x' }),
-      })
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ url: 'https://co/x' }),
+    })
     vi.stubGlobal('fetch', fetchMock)
     await expect(startCheckout('monthly')).resolves.toBe('https://co/x')
     expect(fetchMock).toHaveBeenCalledWith(
@@ -84,12 +80,10 @@ describe('startCheckout / openBillingPortal', () => {
     stubSession()
     vi.stubGlobal(
       'fetch',
-      vi
-        .fn()
-        .mockResolvedValue({
-          ok: true,
-          json: async () => ({ url: 'https://p/x' }),
-        }),
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ url: 'https://p/x' }),
+      }),
     )
     await expect(openBillingPortal()).resolves.toBe('https://p/x')
   })

@@ -36,5 +36,15 @@
     "logout": "Se déconnecter",
     "loggedIn": "Connecté",
     "genericError": "Une erreur est survenue. Réessaie."
+  },
+  "billing": {
+    "title": "Passe en illimité",
+    "quotaReached": "Tu as utilisé tes 3 sessions gratuites du jour.",
+    "monthly": "Mensuel",
+    "yearly": "Annuel (2 mois offerts)",
+    "manage": "Gérer mon abonnement",
+    "premiumBadge": "Premium",
+    "close": "Plus tard",
+    "error": "Le paiement n’a pas pu démarrer. Réessaie."
   }
 }
