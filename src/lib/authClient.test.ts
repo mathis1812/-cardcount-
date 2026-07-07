@@ -34,12 +34,10 @@ describe('signUp', () => {
 
   test('needsConfirmation=true quand la session est nulle', async () => {
     mockAuth({
-      signUp: vi
-        .fn()
-        .mockResolvedValue({
-          data: { user: { id: 'u1' }, session: null },
-          error: null,
-        }),
+      signUp: vi.fn().mockResolvedValue({
+        data: { user: { id: 'u1' }, session: null },
+        error: null,
+      }),
     })
     await expect(signUp('a@b.fr', 'secret123')).resolves.toEqual({
       userId: 'u1',
@@ -71,12 +69,10 @@ describe('signIn', () => {
 
   test('propage l’erreur', async () => {
     mockAuth({
-      signInWithPassword: vi
-        .fn()
-        .mockResolvedValue({
-          data: {},
-          error: { message: 'identifiants invalides' },
-        }),
+      signInWithPassword: vi.fn().mockResolvedValue({
+        data: {},
+        error: { message: 'identifiants invalides' },
+      }),
     })
     await expect(signIn('a@b.fr', 'x')).rejects.toThrow(
       'identifiants invalides',
