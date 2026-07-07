@@ -8,7 +8,8 @@ Migrations SQL versionnées, à appliquer dans l'ordre sur le projet Supabase
 1. Ouvrir le projet Supabase → **SQL Editor**.
 2. Coller le contenu de `migrations/0001_profiles_streaks_sessions.sql`, exécuter.
 3. Coller le contenu de `migrations/0002_functions.sql`, exécuter.
-4. **Auth → Providers → Email** : désactiver « Confirm email » pour le MVP
+4. Coller le contenu de `migrations/0003_billing_quotas.sql`, exécuter.
+5. **Auth → Providers → Email** : désactiver « Confirm email » pour le MVP
    (l'inscription ouvre une session immédiatement). Réactivable plus tard.
 
 ## Appliquer (option B — CLI)
@@ -29,6 +30,19 @@ Pour que l'auth fonctionne en ligne, définir dans Netlify
 
 (valeurs dans Supabase → Settings → API). Le drill anonyme fonctionne sans,
 mais les comptes non.
+
+## Variables d'environnement Netlify (Phase 4 — Stripe)
+
+Secrets serveur (jamais préfixés `VITE_`, jamais dans le bundle) :
+
+- `STRIPE_SECRET_KEY` (clé test `sk_test_…`)
+- `STRIPE_WEBHOOK_SECRET` (`whsec_…`, donné par Stripe à la création du webhook)
+- `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY` (id des prix Stripe `price_…`)
+- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Settings → API)
+
+Webhook Stripe : endpoint `https://<site>.netlify.app/.netlify/functions/stripe-webhook`,
+événements `checkout.session.completed`, `customer.subscription.updated`,
+`customer.subscription.deleted`.
 
 ## Vérifier
 
