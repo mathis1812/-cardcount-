@@ -6,8 +6,11 @@ import { useProfileStore } from './profileStore'
 import { useAuthStore } from '../auth/authStore'
 import { useServerProfileStore } from './serverProfileStore'
 import * as profileApi from '../../lib/profileApi'
+import { useSubscriptionStore } from '../billing/subscriptionStore'
+import * as billingApi from '../../lib/billingApi'
 
 vi.mock('../../lib/profileApi')
+vi.mock('../../lib/billingApi')
 
 const FIXED_NOW = 1_700_000_000_000
 
@@ -92,6 +95,8 @@ describe('DrillScreen — connecté', () => {
     useServerProfileStore.setState({
       profile: { xpTotal: 200, level: 2, currentStreak: 4, longestStreak: 6 },
     })
+    useSubscriptionStore.setState({ isPremium: false, plan: null })
+    vi.mocked(billingApi.startDrillSession).mockResolvedValue({ remaining: 2 })
   })
 
   afterEach(() => {
@@ -114,6 +119,9 @@ describe('DrillScreen — connecté', () => {
     })
     render(<DrillScreen />)
     fireEvent.click(screen.getByRole('button', { name: 'Lancer la session' }))
+    await vi.waitFor(() =>
+      expect(screen.getByText('Carte 0 / 20')).toBeInTheDocument(),
+    )
     act(() => {
       vi.advanceTimersByTime(1200 * 20)
     })
@@ -131,5 +139,33 @@ describe('DrillScreen — connecté', () => {
     )
     // le store local n'est pas touché quand on est connecté
     expect(useProfileStore.getState().xpTotal).toBe(0)
+  })
+
+  test('quota atteint : affiche le paywall au lieu de démarrer', async () => {
+    vi.mocked(billingApi.startDrillSession).mockRejectedValue(
+      new billingApi.QuotaExceededError(),
+    )
+    render(<DrillScreen />)
+    fireEvent.click(screen.getByRole('button', { name: 'Lancer la session' }))
+    await vi.waitFor(() =>
+      expect(
+        screen.getByText('Tu as utilisé tes 3 sessions gratuites du jour.'),
+      ).toBeInTheDocument(),
+    )
+    expect(screen.queryByText('Carte 1 / 20')).not.toBeInTheDocument()
+  })
+
+  test('premium : badge affiché, démarrage sans blocage', async () => {
+    useSubscriptionStore.setState({ isPremium: true, plan: 'monthly' })
+    render(<DrillScreen />)
+    expect(screen.getByText('Premium')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Lancer la session' }))
+    await vi.waitFor(() =>
+      expect(screen.getByText('Carte 0 / 20')).toBeInTheDocument(),
+    )
+    act(() => {
+      vi.advanceTimersByTime(1200)
+    })
+    expect(screen.getByText('Carte 1 / 20')).toBeInTheDocument()
   })
 })

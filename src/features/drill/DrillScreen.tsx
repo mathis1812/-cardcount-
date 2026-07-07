@@ -7,7 +7,14 @@ import {
   levelFromXp,
 } from '../../engine'
 import { recordDrillSession } from '../../lib/profileApi'
+import {
+  startDrillSession,
+  QuotaExceededError,
+  openBillingPortal,
+} from '../../lib/billingApi'
 import { useAuthStore } from '../auth/authStore'
+import { useSubscriptionStore } from '../billing/subscriptionStore'
+import { PaywallPanel } from '../billing/PaywallPanel'
 import { CardView } from './CardView'
 import { CountInput } from './CountInput'
 import { useDrillSession } from './useDrillSession'
@@ -31,6 +38,8 @@ export function DrillScreen() {
   const recordLocalSession = useProfileStore((state) => state.recordSession)
   const serverProfile = useServerProfileStore((state) => state.profile)
   const setServerProfile = useServerProfileStore((state) => state.setProfile)
+  const isPremium = useSubscriptionStore((state) => state.isPremium)
+  const [showPaywall, setShowPaywall] = useState(false)
 
   const displayedXp = isAuthenticated
     ? (serverProfile?.xpTotal ?? 0)
@@ -78,6 +87,21 @@ export function DrillScreen() {
     }
   }
 
+  const handleStart = async () => {
+    if (isAuthenticated) {
+      try {
+        await startDrillSession()
+      } catch (err) {
+        if (err instanceof QuotaExceededError) {
+          setShowPaywall(true)
+          return
+        }
+        throw err
+      }
+    }
+    start(getTierConfig(selectedTier))
+  }
+
   return (
     <main>
       <header>
@@ -85,6 +109,19 @@ export function DrillScreen() {
         <p>{t('drill.xpTotal', { xp: displayedXp })}</p>
         {isAuthenticated && serverProfile && (
           <p>{t('drill.streak', { days: serverProfile.currentStreak })}</p>
+        )}
+        {isPremium && (
+          <>
+            <span>{t('billing.premiumBadge')}</span>
+            <button
+              type="button"
+              onClick={() =>
+                void openBillingPortal().then((u) => window.location.assign(u))
+              }
+            >
+              {t('billing.manage')}
+            </button>
+          </>
         )}
       </header>
 
@@ -96,13 +133,12 @@ export function DrillScreen() {
             {t('drill.newSession')}
           </button>
         </>
+      ) : showPaywall ? (
+        <PaywallPanel onClose={() => setShowPaywall(false)} />
       ) : !session ? (
         <>
           <TierPicker selected={selectedTier} onSelect={setSelectedTier} />
-          <button
-            type="button"
-            onClick={() => start(getTierConfig(selectedTier))}
-          >
+          <button type="button" onClick={() => void handleStart()}>
             {t('drill.start')}
           </button>
         </>
