@@ -87,13 +87,11 @@ export const handler: Handler = async (event) => {
       return customer.id
     },
     saveCustomer: async (uid, customerId) => {
-      await admin
-        .from('subscriptions')
-        .upsert({
-          user_id: uid,
-          stripe_customer_id: customerId,
-          status: 'incomplete',
-        })
+      await admin.from('subscriptions').upsert({
+        user_id: uid,
+        stripe_customer_id: customerId,
+        status: 'incomplete',
+      })
     },
     createSession: async (args) => {
       const session = await stripe.checkout.sessions.create({
