@@ -20,6 +20,7 @@
     "newSession": "Nouvelle session",
     "level": "Niveau {{level}}",
     "xpTotal": "{{xp}} XP",
+    "streak": "Série : {{days}} j",
     "replayTitle": "Rejeu pédagogique",
     "replayCard": "Carte",
     "replayValue": "Valeur Hi-Lo",

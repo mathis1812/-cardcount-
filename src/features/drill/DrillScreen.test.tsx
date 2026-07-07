@@ -3,6 +3,11 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { createSession, getTierConfig, runningCount } from '../../engine'
 import { DrillScreen } from './DrillScreen'
 import { useProfileStore } from './profileStore'
+import { useAuthStore } from '../auth/authStore'
+import { useServerProfileStore } from './serverProfileStore'
+import * as profileApi from '../../lib/profileApi'
+
+vi.mock('../../lib/profileApi')
 
 const FIXED_NOW = 1_700_000_000_000
 
@@ -10,6 +15,8 @@ describe('DrillScreen', () => {
   beforeEach(() => {
     localStorage.clear()
     useProfileStore.setState({ xpTotal: 0, successesByTier: {} })
+    useAuthStore.setState({ userId: null, status: 'anonymous' })
+    useServerProfileStore.setState({ profile: null })
     vi.useFakeTimers()
     vi.setSystemTime(FIXED_NOW)
   })
@@ -72,5 +79,57 @@ describe('DrillScreen', () => {
     render(<DrillScreen />)
     expect(screen.getByText('Niveau 2')).toBeInTheDocument()
     expect(screen.getByText('150 XP')).toBeInTheDocument()
+  })
+})
+
+describe('DrillScreen — connecté', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    useProfileStore.setState({ xpTotal: 0, successesByTier: {} })
+    vi.useFakeTimers()
+    vi.setSystemTime(FIXED_NOW)
+    useAuthStore.setState({ userId: 'u1', status: 'authenticated' })
+    useServerProfileStore.setState({
+      profile: { xpTotal: 200, level: 2, currentStreak: 4, longestStreak: 6 },
+    })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  test('affiche les stats serveur (niveau, XP, streak)', () => {
+    render(<DrillScreen />)
+    expect(screen.getByText('Niveau 2')).toBeInTheDocument()
+    expect(screen.getByText('200 XP')).toBeInTheDocument()
+    expect(screen.getByText('Série : 4 j')).toBeInTheDocument()
+  })
+
+  test('fin de session : appelle recordDrillSession et met à jour le profil serveur', async () => {
+    vi.mocked(profileApi.recordDrillSession).mockResolvedValue({
+      xpTotal: 210,
+      level: 2,
+      currentStreak: 5,
+      longestStreak: 6,
+    })
+    render(<DrillScreen />)
+    fireEvent.click(screen.getByRole('button', { name: 'Lancer la session' }))
+    act(() => {
+      vi.advanceTimersByTime(1200 * 20)
+    })
+    fireEvent.change(
+      screen.getByLabelText('Quel est le running count final ?'),
+      {
+        target: { value: '999' },
+      },
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    await vi.waitFor(() =>
+      expect(profileApi.recordDrillSession).toHaveBeenCalledWith(
+        expect.objectContaining({ tier: 1, correct: false }),
+      ),
+    )
+    // le store local n'est pas touché quand on est connecté
+    expect(useProfileStore.getState().xpTotal).toBe(0)
   })
 })
