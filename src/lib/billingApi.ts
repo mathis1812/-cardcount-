@@ -41,7 +41,7 @@ export async function fetchSubscriptionStatus(): Promise<{
 async function postFunction(path: string, body?: unknown): Promise<string> {
   const { data } = await getSupabase().auth.getSession()
   const token = data.session?.access_token ?? ''
-  const response = await fetch(`/.netlify/functions/${path}`, {
+  const response = await fetch(`/api/${path}`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',

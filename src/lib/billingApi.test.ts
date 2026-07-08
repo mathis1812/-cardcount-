@@ -67,7 +67,7 @@ describe('startCheckout / openBillingPortal', () => {
     vi.stubGlobal('fetch', fetchMock)
     await expect(startCheckout('monthly')).resolves.toBe('https://co/x')
     expect(fetchMock).toHaveBeenCalledWith(
-      '/.netlify/functions/stripe-checkout',
+      '/api/stripe-checkout',
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({ authorization: 'Bearer tok' }),

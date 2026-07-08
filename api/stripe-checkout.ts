@@ -1,7 +1,8 @@
-import type { Handler } from '@netlify/functions'
 import Stripe from 'stripe'
 import { getAdminClient } from './_shared/supabaseAdmin'
 import { userIdFromEvent } from './_shared/auth'
+
+export const config = { runtime: 'nodejs' }
 
 export interface CheckoutDeps {
   userId: string
@@ -38,21 +39,21 @@ export async function buildCheckout(
   })
 }
 
-const json = (statusCode: number, body: unknown) => ({
-  statusCode,
-  headers: { 'content-type': 'application/json' },
-  body: JSON.stringify(body),
-})
+const json = (statusCode: number, body: unknown): Response =>
+  new Response(JSON.stringify(body), {
+    status: statusCode,
+    headers: { 'content-type': 'application/json' },
+  })
 
-export const handler: Handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
+export default async function handler(request: Request): Promise<Response> {
+  if (request.method !== 'POST') {
     return json(405, { error: 'method_not_allowed' })
   }
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '')
   const admin = getAdminClient()
 
   const userId = await userIdFromEvent(
-    { headers: event.headers },
+    { headers: Object.fromEntries(request.headers) },
     async (token) => {
       const { data } = await admin.auth.getUser(token)
       return data.user?.id ?? null
@@ -62,8 +63,10 @@ export const handler: Handler = async (event) => {
     return json(401, { error: 'unauthorized' })
   }
 
-  const plan =
-    (JSON.parse(event.body ?? '{}').plan as 'monthly' | 'yearly') ?? 'monthly'
+  const requestBody = (await request.json().catch(() => ({}))) as {
+    plan?: 'monthly' | 'yearly'
+  }
+  const plan = requestBody.plan ?? 'monthly'
   const result = await buildCheckout({
     userId,
     plan,
@@ -71,7 +74,7 @@ export const handler: Handler = async (event) => {
       monthly: process.env.STRIPE_PRICE_MONTHLY ?? '',
       yearly: process.env.STRIPE_PRICE_YEARLY ?? '',
     },
-    siteUrl: process.env.URL ?? '',
+    siteUrl: process.env.SITE_URL ?? '',
     findCustomerId: async (uid) => {
       const { data } = await admin
         .from('subscriptions')

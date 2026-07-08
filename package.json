@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc -b --noEmit && tsc -p tsconfig.functions.json --noEmit",
+    "typecheck": "tsc -b --noEmit && tsc -p tsconfig.api.json --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "preview": "vite preview"
@@ -24,7 +24,6 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@netlify/functions": "^5.3.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^24.13.2",

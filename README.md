@@ -8,7 +8,7 @@ Spec de conception : [docs/superpowers/specs/2026-07-05-cardcount-design.md](doc
 ## Stack
 
 Vite + React + TypeScript (SPA) · Supabase (auth, Postgres, RLS) ·
-Netlify (hébergement + Functions Stripe) · Stripe (abonnements)
+Vercel (hébergement + Functions Stripe) · Stripe (abonnements)
 
 ## Prérequis
 
@@ -32,7 +32,7 @@ Netlify (hébergement + Functions Stripe) · Stripe (abonnements)
 
 Voir `.env.example` : `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
 (valeurs dans Supabase > Settings > API). Aucun secret côté client — les clés
-secrètes (Stripe, service role) vivent dans les env vars Netlify.
+secrètes (Stripe, service role) vivent dans les env vars Vercel.
 
 ## Structure
 

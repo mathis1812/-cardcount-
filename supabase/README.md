@@ -20,10 +20,11 @@ supabase link --project-ref <ref>
 supabase db push
 ```
 
-## Variables d'environnement Netlify
+## Variables d'environnement Vercel
 
-Pour que l'auth fonctionne en ligne, définir dans Netlify
-(Site settings → Environment variables) :
+Pour que l'auth fonctionne en ligne, définir dans Vercel
+(Project settings → Environment Variables), ou via CLI
+`vercel env add VITE_SUPABASE_URL` :
 
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
@@ -31,7 +32,7 @@ Pour que l'auth fonctionne en ligne, définir dans Netlify
 (valeurs dans Supabase → Settings → API). Le drill anonyme fonctionne sans,
 mais les comptes non.
 
-## Variables d'environnement Netlify (Phase 4 — Stripe)
+## Variables d'environnement Vercel (Phase 4 — Stripe)
 
 Secrets serveur (jamais préfixés `VITE_`, jamais dans le bundle) :
 
@@ -39,8 +40,9 @@ Secrets serveur (jamais préfixés `VITE_`, jamais dans le bundle) :
 - `STRIPE_WEBHOOK_SECRET` (`whsec_…`, donné par Stripe à la création du webhook)
 - `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY` (id des prix Stripe `price_…`)
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Settings → API)
+- `SITE_URL` (URL publique du déploiement, ex. `https://cardcount.vercel.app`)
 
-Webhook Stripe : endpoint `https://<site>.netlify.app/.netlify/functions/stripe-webhook`,
+Webhook Stripe : endpoint `https://<site>.vercel.app/api/stripe-webhook`,
 événements `checkout.session.completed`, `customer.subscription.updated`,
 `customer.subscription.deleted`.
 

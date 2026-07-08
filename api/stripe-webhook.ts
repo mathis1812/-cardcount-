@@ -1,4 +1,3 @@
-import type { Handler } from '@netlify/functions'
 import Stripe from 'stripe'
 import { getAdminClient } from './_shared/supabaseAdmin'
 import {
@@ -7,6 +6,8 @@ import {
   type SubscriptionRow,
   type UpsertDeps,
 } from './_shared/subscriptionUpsert'
+
+export const config = { runtime: 'nodejs' }
 
 export interface WebhookDeps {
   verifySignature: (rawBody: string, signature: string) => StripeEventLike
@@ -28,15 +29,16 @@ export async function processWebhook(
   return { statusCode: 200, body: 'ok' }
 }
 
-export const handler: Handler = async (event) => {
+export default async function handler(request: Request): Promise<Response> {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '')
   const admin = getAdminClient()
-  const signature = event.headers['stripe-signature'] ?? ''
+  const rawBody = await request.text()
+  const signature = request.headers.get('stripe-signature') ?? ''
 
-  const result = await processWebhook(event.body ?? '', signature, {
-    verifySignature: (rawBody, sig) =>
+  const result = await processWebhook(rawBody, signature, {
+    verifySignature: (body, sig) =>
       stripe.webhooks.constructEvent(
-        rawBody,
+        body,
         sig,
         process.env.STRIPE_WEBHOOK_SECRET ?? '',
       ) as unknown as StripeEventLike,
@@ -65,5 +67,5 @@ export const handler: Handler = async (event) => {
       return applyStripeEvent(evt, upsertDeps)
     },
   })
-  return { statusCode: result.statusCode, body: result.body }
+  return new Response(result.body, { status: result.statusCode })
 }
