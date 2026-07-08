@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest'
-import { buildPortal } from './stripe-portal'
+import { buildPortal } from '../stripe-portal'
 
 describe('buildPortal', () => {
   test('crée une session de portail pour le customer et renvoie l’URL', async () => {

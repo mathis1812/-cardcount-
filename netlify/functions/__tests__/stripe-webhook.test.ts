@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest'
-import { processWebhook } from './stripe-webhook'
+import { processWebhook } from '../stripe-webhook'
 
 const deps = (verified = true) => ({
   verifySignature: vi.fn(() => {

@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest'
-import { buildCheckout } from './stripe-checkout'
+import { buildCheckout } from '../stripe-checkout'
 
 const baseDeps = () => ({
   userId: 'u1',
